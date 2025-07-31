@@ -6,19 +6,19 @@
 // int clock::answer[11]={};
 bool clock::execute_once() {
 
-    if (ticker==55) {
-        Memory::show_mem();
-    }
+    // if (ticker==55) {
+    //     Memory::show_mem();
+    // }
     // std::cerr<<"ra="<<std::hex<<Register::regs[1]<<std::endl;
     // std::cerr<<"sp="<<std::hex<<Register::regs[2]<<std::endl;
-    std::cerr<<"s0="<<std::hex<<Register::regs[8]<<std::endl;
-    std::cerr<<"s1="<<std::hex<<Register::regs[9]<<std::endl;
-    std::cerr<<"a0="<<std::dec<<Register::regs[10]<<std::endl;
-    std::cerr<<"a1="<<std::dec<<Register::regs[11]<<std::endl;
-    std::cerr<<"a2="<<std::dec<<Register::regs[12]<<std::endl;
-    std::cerr<<"a3="<<std::hex<<Register::regs[13]<<std::endl;
-    std::cerr<<"a4="<<std::hex<<Register::regs[14]<<std::endl;
-    std::cerr<<"a5="<<std::hex<<Register::regs[15]<<std::endl;
+    // std::cerr<<"s0="<<std::hex<<Register::regs[8]<<std::endl;
+    // std::cerr<<"s1="<<std::hex<<Register::regs[9]<<std::endl;
+    // std::cerr<<"a0="<<std::dec<<Register::regs[10]<<std::endl;
+    // std::cerr<<"a1="<<std::dec<<Register::regs[11]<<std::endl;
+    // std::cerr<<"a2="<<std::dec<<Register::regs[12]<<std::endl;
+    // std::cerr<<"a3="<<std::hex<<Register::regs[13]<<std::endl;
+    // std::cerr<<"a4="<<std::hex<<Register::regs[14]<<std::endl;
+    // std::cerr<<"a5="<<std::hex<<Register::regs[15]<<std::endl;
     // std::cerr<<"s2="<<std::hex<<Register::regs[18]<<std::endl;
     // std::cerr<<"s3="<<std::hex<<Register::regs[19]<<std::endl;
     // std::cerr<<"s4="<<std::hex<<Register::regs[20]<<std::endl;
@@ -28,9 +28,9 @@ bool clock::execute_once() {
     // std::cerr<<"s8="<<std::hex<<Register::regs[24]<<std::endl;
     // std::cerr<<"s9="<<std::hex<<Register::regs[25]<<std::endl;
     // std::cerr<<"pc="<<std::hex<<Register::pc<<std::endl;
-    std::cerr<<"pc_busy:"<<Reg_status::Busy_pc<<std::endl;
-    RS::show_everything();
-    Register::show_reg();
+    // std::cerr<<"pc_busy:"<<Reg_status::Busy_pc<<std::endl;
+    // RS::show_everything();
+    // Register::show_reg();
     // if (a!=Register::regs[20]) {
     //     a=Register::regs[20];
     //     answer[a]=Memory::read4(0x135c);
