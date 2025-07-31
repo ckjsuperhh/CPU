@@ -60,6 +60,9 @@ bool ROB::execute_5() {
                 end=true;
                 if (!load.contains(ROB_Table[i].op)) {
                     RS::clear(code[i]);
+                    if (jump.contains(ROB_Table[i].op)) {
+                        Reg_status::Busy_pc=false;//这一步结束之后,Busy_pc不再忙碌(由于之前的bubble逻辑，这行指令之后必定不会有任何指令的输入)
+                    }
                 }else {//算出来地址之后,LSB的数据全部准备好了,我是不是可以进行修改了
                     if (ROB_Table[i].op=="sb") {
                         LSB_seq::modify(ROB_Table[i].i,ROB_Table[i].value,0xFF&ROB_Table[i].rs2_val);
@@ -71,7 +74,6 @@ bool ROB::execute_5() {
                         LSB_seq::modify(ROB_Table[i].i,ROB_Table[i].value);
                     }
                 }
-                Reg_status::Busy_pc=false;//这一步结束之后,Busy_pc不再忙碌(由于之前的bubble逻辑，这行指令之后必定不会有任何指令的输入)
             }//否则就等待数据全部都准备好了
             //我发现好像这一步就可以清空对应的RS了，除了Load相关的指令以外，下一步都准备提交了
         } else if (ROB_Table[i].st == Exec) {//运行完观察是否要写回Reg和内存,这个时候就要分类是否与内存有关
