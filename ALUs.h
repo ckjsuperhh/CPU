@@ -155,12 +155,12 @@ public:
             ins.value=ins.pc+4;
             Register::pc=ins.pc+ins.imm;
             Reg_status::Busy_pc=false;
-            Ins_Cache::modify(Register::pc);
+            Ins_Cache::clear(Register::pc);
         } else if (ins.op == "jalr") {
             ins.value=ins.pc+4;
             Register::pc=ins.rs1_val+ins.imm;
             Reg_status::Busy_pc=false;
-            Ins_Cache::modify(Register::pc);//把Ins_Cache的指针修改成对应的跳转值
+            Ins_Cache::clear(Register::pc);//把Ins_Cache的指针修改成对应的跳转值
         } else if (ins.op == "auipc") {
             ins.imm<<=12;
             ins.value=ins.imm+ins.pc;

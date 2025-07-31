@@ -29,6 +29,7 @@ inst::inst(const instructions& a)
     :i(-1),op(a.op), pc(a.pc),rd(a.rd), rs1(a.rs1), rs2(a.rs2), imm(a.imm), st(Decoded) {}
 inline int p=0;
 inline int q=0;
+inline bool get_exit=0;
 // 静态成员函数实现
 bool ROB::execute_5() {
     std::cerr<<std::dec<<head<<"===========================================\n"<<std::dec<<tail<<"===================================================\n";
@@ -50,9 +51,12 @@ bool ROB::execute_5() {
         } else if (ROB_Table[i].st == Issue) {
             if (!end_of_ALU&&RS::Qj[code[i]]==-1&&RS::Qk[code[i]]==-1) {//数据已经做好准备,可以ALUs伺候
                 calculate::cal(ROB_Table[i]);//答案数据准备好了，注意这边似乎还没有处理pc相关的任务，后续再说吧
+                std::cerr<<std::dec<<i<<"-----ALU calculating..."<<ROB_Table[i].op<<"...Consequences:"<<ROB_Table[i].value<<std::endl;
                 ROB_Table[i].st=Exec;
-                CDB::add(i,ROB_Table[i].value);//加入队列中准备进行一个数据的广播
-                end_of_ALU=true;//一次只允许一次ALU工作
+                if (!load.contains(ROB_Table[i].op)) {//注意地址不需要广播，即使要广播也是从内存中读出来再广播
+                    CDB::add(i,ROB_Table[i].value);//加入队列中准备进行一个数据的广播
+                }
+                 end_of_ALU=true;//一次只允许一次ALU工作
                 end=true;
                 if (!load.contains(ROB_Table[i].op)) {
                     RS::clear(code[i]);
@@ -92,7 +96,8 @@ bool ROB::execute_5() {
                                 std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                                 ROB_Table[i].st=Commit;
                             }else {
-                                ROB_Table[i].st=Write;//从内存读出来之后我还需要把他放回寄存器
+                                ROB_Table[i].st=Write;//从内存读出来之后我还需要把他放回寄存器，这个时候需要进行广播，这个值就是后续要写入寄存器的值
+                                CDB::add(i,ROB_Table[i].value);;
                             }
                             RS::clear(code[i]);
                         }
@@ -131,6 +136,7 @@ bool ROB::execute_5() {
                                     std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                                 }else {
                                     ROB_Table[i].st=Write;//从内存读出来之后我还需要把他放回寄存器
+                                    CDB::add(i,ROB_Table[i].value);;
                                 }
                                 RS::clear(code[i]);
                             }
@@ -155,15 +161,24 @@ bool ROB::execute_5() {
             end=true;
         } else {
             if (ROB_Table[i].st == None||ROB_Table[i].st == Commit) {//还没有载入语句
-                if (!Ins_Cache::cache.empty()&&!Reg_status::Busy_pc) {//如果非空就可以载入一条指令，由于是最后在None的位置载入，所以jump指令的处理必定会在载入之前，可以及时封存载入(clear掉),但我还是写上与Busy_pc相关的逻辑吧
+                if (!Ins_Cache::cache.empty()&&!Reg_status::Busy_pc&&!get_exit) {//如果非空就可以载入一条指令，由于是最后在None的位置载入，所以jump指令的处理必定会在载入之前，可以及时封存载入(clear掉),但我还是写上与Busy_pc相关的逻辑吧
                     const auto [fst, snd]=Ins_Cache::read();
                     ROB_Table[i].pc=snd;
                     ROB_Table[i].ins=fst;
+                    {
+                        if (ROB_Table[i].ins==0x00f54533) {
+                            std::cout<<p<<":"<<Register::regs[10]<<std::endl;
+                            ++p;
+                        }
+                    }
                     tail++;
                     ROB_Table[i].st=Waiting;
                     Register::pc=ROB_Table[i].pc;//当且仅当载入的时候正常修改pc,其他可能会修改pc的情况仅仅存在于ALU
                     end=true;
                     std::cerr<<std::dec<<i<<"-----Loading instruction from Cache:(pc)"<<std::hex<<snd<<"  (ins)"<< std::setw(8)<< std::setfill('0')<<fst<<std::endl;
+                    if (ROB_Table[i].ins==0x0ff00513) {
+                        get_exit=true;
+                    }
                     break;
                 }else if (!Ins_Cache::cache_mem.empty()||Ins_Cache::st==WAITING||Ins_Cache::st==LAST_READ) {//如果其他指令都不再运行了，但是还有指令没有导入，但是指令队列空了，那我应该还要特判一下
                     end=true;//如果等待读入的站还没空,或者还处在等待状态中,我就不能随意结束程序
@@ -302,15 +317,12 @@ bool ROB::execute_1() {
             end=true;
         } else {
             if (ROB_Table[i].st == None||ROB_Table[i].st == Commit) {//还没有载入语句
-                if (!Ins_Cache::cache.empty()&&!Reg_status::Busy_pc) {//如果非空就可以载入一条指令，由于是最后在None的位置载入，所以jump指令的处理必定会在载入之前，可以及时封存载入(clear掉),但我还是写上与Busy_pc相关的逻辑吧
+                if (!Ins_Cache::cache.empty()&&!Reg_status::Busy_pc&&!get_exit) {//如果非空就可以载入一条指令，由于是最后在None的位置载入，所以jump指令的处理必定会在载入之前，可以及时封存载入(clear掉),但我还是写上与Busy_pc相关的逻辑吧
                     const auto [fst, snd]=Ins_Cache::read();
                     ROB_Table[i]=inst{};
                     ROB_Table[i].pc=snd;
                     ROB_Table[i].ins=fst;
-                    // if (ROB_Table[i].ins==0x00f54533) {
-                    //     std::cout<<p<<":"<<Register::regs[10]<<std::endl;
-                    //     ++p;
-                    // }
+
                     // if (ROB_Table[i].ins==0xfe079ae3) {
                     //     std::cout<<q<<std::endl;
                     //     ++q;
@@ -326,9 +338,12 @@ bool ROB::execute_1() {
                     tail++;
                     Register::pc=ROB_Table[i].pc;//当且仅当载入的时候正常修改pc,其他可能会修改pc的情况仅仅存在于ALU
                     end=true;
-                    if (ok==1) {
-                        std::cerr<<"Loading instruction from Cache:(pc)"<<std::hex<<snd<<"  (ins)"<< std::setw(8)<< std::setfill('0')<<fst<<std::endl;
+                    if (ROB_Table[i].ins==0x0ff00513) {
+                        get_exit=true;
                     }
+
+                        std::cerr<<"Loading instruction from Cache:(pc)"<<std::hex<<snd<<"  (ins)"<< std::setw(8)<< std::setfill('0')<<fst<<std::endl;
+
                 }else if (!Ins_Cache::cache_mem.empty()||Ins_Cache::st==WAITING||Ins_Cache::st==LAST_READ) {//如果其他指令都不再运行了，但是还有指令没有导入，但是指令队列空了，那我应该还要特判一下
                     end=true;//如果等待读入的站还没空,或者还处在等待状态中,我就不能随意结束程序
                 }
@@ -336,10 +351,10 @@ bool ROB::execute_1() {
                 if (instructions ins(ROB_Table[i].ins,ROB_Table[i].pc); ins.op=="uk") {
                     //我也不知道应该怎么办
                 }else {
-                    if (ok==1) {
+
                         std::cerr<<"Decoding:"<<"(decoded info)\n";
                     ins.show();
-                    }
+
 
                     const int pc=ROB_Table[i].pc;//来个暗度陈仓
                     const __uint32_t instruction=ROB_Table[i].ins;
