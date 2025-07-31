@@ -170,12 +170,12 @@ bool ROB::execute_5() {
                     const auto [fst, snd]=Ins_Cache::read();
                     ROB_Table[i].pc=snd;
                     ROB_Table[i].ins=fst;
-                    {
-                        if (ROB_Table[i].ins==0x00f54533) {
-                            std::cout<<p<<":"<<Register::regs[10]<<std::endl;
-                            ++p;
-                        }
-                    }
+                    // {
+                    //     if (ROB_Table[i].ins==0x00f54533) {
+                    //         std::cout<<p<<":"<<Register::regs[10]<<std::endl;
+                    //         ++p;
+                    //     }
+                    // }
                     tail++;
                     ROB_Table[i].st=Waiting;
                     Register::pc=ROB_Table[i].pc;//当且仅当载入的时候正常修改pc,其他可能会修改pc的情况仅仅存在于ALU
