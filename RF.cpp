@@ -99,7 +99,7 @@ void Write_regs::execute(const int i, const int Reg, const int value) {//对应R
             Reg_status::Busy[Reg]=false;//不忙了
             Reg_status::Reorder[Reg]=-1;
             Register::write(Reg,value);//修改寄存器的值
-            std::cerr<<"Writing register "<<Register::get_name(Reg)<<" with "<<std::hex<<value<<std::endl;
+            // std::cerr<<"Writing register "<<Register::get_name(Reg)<<" with "<<std::hex<<value<<std::endl;
         }
 };
 int Register::read_pc() {//如果失败就返回-1,不然就是正常值

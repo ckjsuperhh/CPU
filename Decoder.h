@@ -195,7 +195,7 @@ inline void decoder(const __uint32_t ins, std::string &op, int &rd, int &rs1, in
             imm_11 = (ins >> 7) & 1;           // 第11位
 
             // 组合12位立即数（未左移前）
-             b_imm_raw = (imm_12 << 12) | (imm_10_5 << 5) | (imm_11 << 11) | (imm_4_1 << 1);
+             b_imm_raw = (imm_12 << 12 ) | (imm_10_5 << 5) | (imm_11 << 11) | (imm_4_1 << 1);
             // 符号位扩展：12位 → 32位
             if (imm_12) {
                 imm = b_imm_raw | 0xFFFFF000;  // 高20位填充1
