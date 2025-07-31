@@ -17,8 +17,8 @@ bool clock::execute_once() {
     std::cerr<<"a1="<<std::dec<<Register::regs[11]<<std::endl;
     std::cerr<<"a2="<<std::dec<<Register::regs[12]<<std::endl;
     std::cerr<<"a3="<<std::hex<<Register::regs[13]<<std::endl;
-    std::cerr<<"a4="<<std::dec<<Register::regs[14]<<std::endl;
-    std::cerr<<"a5="<<std::dec<<Register::regs[15]<<std::endl;
+    std::cerr<<"a4="<<std::hex<<Register::regs[14]<<std::endl;
+    std::cerr<<"a5="<<std::hex<<Register::regs[15]<<std::endl;
     // std::cerr<<"s2="<<std::hex<<Register::regs[18]<<std::endl;
     // std::cerr<<"s3="<<std::hex<<Register::regs[19]<<std::endl;
     // std::cerr<<"s4="<<std::hex<<Register::regs[20]<<std::endl;

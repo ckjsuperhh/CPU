@@ -33,7 +33,7 @@ inline bool get_exit=0;
 // 静态成员函数实现
 bool ROB::execute_5() {
     std::cerr<<std::dec<<head<<"===========================================\n"<<std::dec<<tail<<"===================================================\n";
-    std::cerr<<ROB_Table[head].op<<"-------"<<ROB_Table[tail].op<<std::endl;
+    std::cerr<<ROB_Table[head%MOD].op<<"-------"<<ROB_Table[tail%MOD].op<<std::endl;
     bool end=false;
     bool end_of_ALU=false;
     bool end_of_Commit=false;
@@ -115,7 +115,7 @@ bool ROB::execute_5() {
                 }
                 //我应该修改寄存器，对应的值，这应该就够了
             }else {
-                if (ROB_Table[i-1].st==Commit&&!end_of_Commit){//上一条必须是已经Commit过了并且这回合没有其他提交过
+                if (ROB_Table[(i+MOD-1)%MOD].st==Commit&&!end_of_Commit){//上一条必须是已经Commit过了并且这回合没有其他提交过
                     if (add.contains(ROB_Table[i].op)) {
                         if (ROB_Table[i].ins==0x0ff00513) {
                             if (Register::regs[10]==48) {
