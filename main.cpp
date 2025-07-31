@@ -22,7 +22,7 @@ Memory::store_ins();
 
 
     while (clock::execute_once()) {
-std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
+// std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
     }
 
     return 0;

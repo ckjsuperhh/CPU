@@ -28,8 +28,8 @@ bool clock::execute_once() {
     // std::cerr<<"s8="<<std::hex<<Register::regs[24]<<std::endl;
     // std::cerr<<"s9="<<std::hex<<Register::regs[25]<<std::endl;
     // std::cerr<<"pc="<<std::hex<<Register::pc<<std::endl;
-    RS::show_everything();
-    Register::show_reg();
+    // RS::show_everything();
+    // Register::show_reg();
     // if (a!=Register::regs[20]) {
     //     a=Register::regs[20];
     //     answer[a]=Memory::read4(0x135c);
