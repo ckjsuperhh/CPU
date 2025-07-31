@@ -86,6 +86,9 @@ bool ROB::execute_5() {
                     ROB_Table[i].st=Commit;
                     head++;
                     std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
+                    if (ROB_Table[i].pc==0x1044) {//当交xor的时候，一定是函数调用成功读取过的
+                            std::cout<<"函数调用:"<<Register::regs[10]<<std::endl;
+                        }
                     end_of_Commit=true;
                 }else if (load.contains(ROB_Table[i].op)) {//其他情况以后再进行尝试
                     if (!end_of_LSB) {
@@ -252,7 +255,7 @@ bool ROB::execute_1() {
                 if (add.contains(ROB_Table[i].op)) {
                     if (ROB_Table[i].ins==0x0ff00513) {
                         std::cout<<std::dec<<(Register::regs[10]&0xFF);
-                        // std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
+                        std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                         exit(0);
                     }
                     Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);

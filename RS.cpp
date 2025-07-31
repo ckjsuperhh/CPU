@@ -28,13 +28,24 @@ int RS::launch(inst &ins, const int i) {
             op[0]=ins.op;
             Dest[0]=i;
             Read_regs::execute(ins,Vj[0],Vk[0],Qj[0],Qk[0],pj[0],pk[0]);//读取Reg的值,并且修改RS表
-            if (Qj[0]!=-1&& ROB::ROB_Table[Qj[0]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+            if (Qj[0]!=-1&& ROB::ROB_Table[Qj[0]].broadcast==true) {
+                //没有写回寄存器但是已经被广播过了,这个时候还需要注意也要写会ROB中
                 Vj[0]=ROB::ROB_Table[Qj[0]].value;
                 Qj[0]=-1;
+                if (pj[0]== Posi::rs1) {
+                    ins.rs1_val=Vj[0];
+                }else if (pj[0]== Posi::rs2) {
+                    ins.rs2_val=Vj[0];
+                }//只有可能两个寄存器没读到呀
             }
             if (Qk[0]!=-1&& ROB::ROB_Table[Qk[0]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vk[0]=ROB::ROB_Table[Qk[0]].value;
                 Qk[0]=-1;
+                if (pk[0]== Posi::rs1) {
+                    ins.rs1_val=Vk[0];
+                }else if (pk[0]== Posi::rs2) {
+                    ins.rs2_val=Vk[0];
+                }
             }
             if (ins.op=="lb"||ins.op=="lbu"||ins.op=="lh"||ins.op=="lhu"||ins.op=="lw") {
                 Write_regs::mark_Reg(ins.rd,i);
@@ -52,10 +63,20 @@ int RS::launch(inst &ins, const int i) {
             if (Qj[1]!=-1&& ROB::ROB_Table[Qj[1]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vj[1]=ROB::ROB_Table[Qj[1]].value;
                 Qj[1]=-1;
+                if (pj[1]== Posi::rs1) {
+                    ins.rs1_val=Vj[1];
+                }else if (pj[1]== Posi::rs2) {
+                    ins.rs2_val=Vj[1];
+                }
             }
             if (Qk[1]!=-1&& ROB::ROB_Table[Qk[1]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vk[1]=ROB::ROB_Table[Qk[1]].value;
                 Qk[1]=-1;
+                if (pk[1]== Posi::rs1) {
+                    ins.rs1_val=Vk[1];
+                }else if (pk[1]== Posi::rs2) {
+                    ins.rs2_val=Vk[1];
+                }
             }
             if (ins.op=="lb"||ins.op=="lbu"||ins.op=="lh"||ins.op=="lhu"||ins.op=="lw") {
                 Write_regs::mark_Reg(ins.rd,i);
@@ -78,10 +99,20 @@ int RS::launch(inst &ins, const int i) {
             if (Qj[2]!=-1&& ROB::ROB_Table[Qj[2]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vj[2]=ROB::ROB_Table[Qj[2]].value;
                 Qj[2]=-1;
+                if (pj[2]== Posi::rs1) {
+                    ins.rs1_val=Vj[2];
+                }else if (pj[2]== Posi::rs2) {
+                    ins.rs2_val=Vj[2];
+                }
             }
             if (Qk[2]!=-1&& ROB::ROB_Table[Qk[2]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vk[2]=ROB::ROB_Table[Qk[2]].value;
                 Qk[2]=-1;
+                if (pk[2]== Posi::rs1) {
+                    ins.rs1_val=Vk[2];
+                }else if (pk[2]== Posi::rs2) {
+                    ins.rs2_val=Vk[2];
+                }
             }
             Write_regs::mark_Reg(ins.rd,i);
             // std::cerr<<"here are the RS:\n";
@@ -97,10 +128,20 @@ int RS::launch(inst &ins, const int i) {
             if (Qj[3]!=-1&& ROB::ROB_Table[Qj[3]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vj[3]=ROB::ROB_Table[Qj[3]].value;
                 Qj[3]=-1;
+                if (pj[3]== Posi::rs1) {
+                    ins.rs1_val=Vj[3];
+                }else if (pj[3]== Posi::rs2) {
+                    ins.rs2_val=Vj[3];
+                }
             }
             if (Qk[3]!=-1&& ROB::ROB_Table[Qk[3]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vk[3]=ROB::ROB_Table[Qk[3]].value;
                 Qk[3]=-1;
+                if (pk[3]== Posi::rs1) {
+                    ins.rs1_val=Vk[3];
+                }else if (pk[3]== Posi::rs2) {
+                    ins.rs2_val=Vk[3];
+                }
             }
             Write_regs::mark_Reg(ins.rd,i);
             // std::cerr<<"here are the RS:\n";
@@ -121,10 +162,20 @@ int RS::launch(inst &ins, const int i) {
             if (Qj[4]!=-1&& ROB::ROB_Table[Qj[4]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vj[4]=ROB::ROB_Table[Qj[4]].value;
                 Qj[4]=-1;
+                if (pj[4]== Posi::rs1) {
+                    ins.rs1_val=Vj[4];
+                }else if (pj[4]== Posi::rs2) {
+                    ins.rs2_val=Vj[4];
+                }
             }
             if (Qk[4]!=-1&& ROB::ROB_Table[Qk[4]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vk[4]=ROB::ROB_Table[Qk[4]].value;
                 Qk[4]=-1;
+                if (pk[4]== Posi::rs1) {
+                    ins.rs1_val=Vk[4];
+                }else if (pk[4]== Posi::rs2) {
+                    ins.rs2_val=Vk[4];
+                }
             }
             if (ins.op=="jal"||ins.op=="jalr") {
                 Write_regs::mark_Reg(ins.rd,i);
@@ -143,10 +194,20 @@ int RS::launch(inst &ins, const int i) {
             if (Qj[5]!=-1&& ROB::ROB_Table[Qj[5]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vj[5]=ROB::ROB_Table[Qj[5]].value;
                 Qj[5]=-1;
+                if (pj[5]== Posi::rs1) {
+                    ins.rs1_val=Vj[5];
+                }else if (pj[5]== Posi::rs2) {
+                    ins.rs2_val=Vj[5];
+                }
             }
             if (Qk[5]!=-1&& ROB::ROB_Table[Qk[5]].broadcast==true) {//没有写回寄存器但是已经被广播过了
                 Vk[5]=ROB::ROB_Table[Qk[5]].value;
                 Qk[5]=-1;
+                if (pk[5]== Posi::rs1) {
+                    ins.rs1_val=Vk[5];
+                }else if (pk[5]== Posi::rs2) {
+                    ins.rs2_val=Vk[5];
+                }
             }
             if (ins.op=="jal"||ins.op=="jalr") {
                 Write_regs::mark_Reg(ins.rd,i);
