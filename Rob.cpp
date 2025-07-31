@@ -31,6 +31,8 @@ inline int p=0;
 inline int q=0;
 // 静态成员函数实现
 bool ROB::execute_5() {
+    std::cerr<<std::dec<<head<<"===========================================\n"<<std::dec<<tail<<"===================================================\n";
+    std::cerr<<ROB_Table[head].op<<"-------"<<ROB_Table[tail].op<<std::endl;
     bool end=false;
     bool end_of_ALU=false;
     bool end_of_Commit=false;
@@ -40,7 +42,7 @@ bool ROB::execute_5() {
         const int i=t%MOD;
         if (ROB_Table[i].st == Decoded) {//准备发射,先看RS里边有没有适合的空位,再从reg中读值(两步都应该在这边干)
             if (!end_of_launch) {
-                std::cerr<<"launching ins:"<<std::hex<< std::setw(8)<<std::setfill('0')<<ROB_Table[i].ins<<std::endl;
+                std::cerr<<std::dec<<i<<"-----launching ins:"<<std::hex<< std::setw(8)<<std::setfill('0')<<ROB_Table[i].ins<<std::endl;
                 code[i]=RS::launch(ROB_Table[i],i);
                 end_of_launch=true;
             }
@@ -56,13 +58,13 @@ bool ROB::execute_5() {
                     RS::clear(code[i]);
                 }else {//算出来地址之后,LSB的数据全部准备好了,我是不是可以进行修改了
                     if (ROB_Table[i].op=="sb") {
-                        LSB_seq::modify(i,ROB_Table[i].value,0xFF&ROB_Table[i].rs2_val);
+                        LSB_seq::modify(ROB_Table[i].i,ROB_Table[i].value,0xFF&ROB_Table[i].rs2_val);
                     }else if (ROB_Table[i].op=="sh") {
-                        LSB_seq::modify(i,ROB_Table[i].value,0xFFFF&ROB_Table[i].rs2_val);
+                        LSB_seq::modify(ROB_Table[i].i,ROB_Table[i].value,0xFFFF&ROB_Table[i].rs2_val);
                     }else if (ROB_Table[i].op=="sw") {
-                        LSB_seq::modify(i,ROB_Table[i].value,ROB_Table[i].rs2_val);
+                        LSB_seq::modify(ROB_Table[i].i,ROB_Table[i].value,ROB_Table[i].rs2_val);
                     }else {
-                        LSB_seq::modify(i,ROB_Table[i].value);
+                        LSB_seq::modify(ROB_Table[i].i,ROB_Table[i].value);
                     }
                 }
                 Reg_status::Busy_pc=false;//这一步结束之后,Busy_pc不再忙碌(由于之前的bubble逻辑，这行指令之后必定不会有任何指令的输入)
@@ -79,6 +81,7 @@ bool ROB::execute_5() {
                     Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
                     ROB_Table[i].st=Commit;
                     head++;
+                    std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                     end_of_Commit=true;
                 }else if (load.contains(ROB_Table[i].op)) {//其他情况以后再进行尝试
                     if (!end_of_LSB) {
@@ -86,6 +89,7 @@ bool ROB::execute_5() {
                         if (LSB_seq::execute(ROB_Table[i].value)) {
                             if (ROB_Table[i].op=="sb"||ROB_Table[i].op=="sh"||ROB_Table[i].op=="sw") {//写完可以直接commit了
                                 head++;
+                                std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                                 ROB_Table[i].st=Commit;
                             }else {
                                 ROB_Table[i].st=Write;//从内存读出来之后我还需要把他放回寄存器
@@ -96,6 +100,7 @@ bool ROB::execute_5() {
                 }else {//剩下的jump指令还没有处理
                     ROB_Table[i].st=Commit;
                     head++;
+                    std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                     end_of_Commit=true;
                 }
                 //我应该修改寄存器，对应的值，这应该就够了
@@ -114,13 +119,16 @@ bool ROB::execute_5() {
                         Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
                         ROB_Table[i].st=Commit;
                         head++;
+                        std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                         end_of_Commit=true;
                     }else if (load.contains(ROB_Table[i].op)) {
                         if (!end_of_LSB) {
                             end_of_LSB=true;
                             if (LSB_seq::execute(ROB_Table[i].value)) {
                                 if (ROB_Table[i].op=="sb"||ROB_Table[i].op=="sh"||ROB_Table[i].op=="sw") {//写完可以直接commit了
+                                    head++;
                                     ROB_Table[i].st=Commit;
+                                    std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                                 }else {
                                     ROB_Table[i].st=Write;//从内存读出来之后我还需要把他放回寄存器
                                 }
@@ -131,6 +139,7 @@ bool ROB::execute_5() {
                         Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
                         ROB_Table[i].st=Commit;
                         head++;
+                        std::cerr<<std::hex<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                     }
                 }
             }
@@ -140,6 +149,7 @@ bool ROB::execute_5() {
                 Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
                 ROB_Table[i].st=Commit;
                 head++;
+                std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                 end_of_Commit=true;
             }
             end=true;
@@ -153,6 +163,8 @@ bool ROB::execute_5() {
                     ROB_Table[i].st=Waiting;
                     Register::pc=ROB_Table[i].pc;//当且仅当载入的时候正常修改pc,其他可能会修改pc的情况仅仅存在于ALU
                     end=true;
+                    std::cerr<<std::dec<<i<<"-----Loading instruction from Cache:(pc)"<<std::hex<<snd<<"  (ins)"<< std::setw(8)<< std::setfill('0')<<fst<<std::endl;
+                    break;
                 }else if (!Ins_Cache::cache_mem.empty()||Ins_Cache::st==WAITING||Ins_Cache::st==LAST_READ) {//如果其他指令都不再运行了，但是还有指令没有导入，但是指令队列空了，那我应该还要特判一下
                     end=true;//如果等待读入的站还没空,或者还处在等待状态中,我就不能随意结束程序
                 }
@@ -160,8 +172,8 @@ bool ROB::execute_5() {
                 if (instructions ins(ROB_Table[i].ins,ROB_Table[i].pc); ins.op=="uk") {
                     //我也不知道应该怎么办
                 }else {
-                    // std::cerr<<"Decoding:"<<"(decoded info)\n";
-                    // ins.show();
+                    std::cerr<<std::dec<<i<<"-----Decoding:"<<"(decoded info)\n";
+                    ins.show();
                     const int pc=ROB_Table[i].pc;//来个暗度陈仓
                     const __uint32_t instruction=ROB_Table[i].ins;
                     ROB_Table[i]=inst{ins};//Decode完成之后,我需要准备开始发射了
@@ -292,6 +304,7 @@ bool ROB::execute_1() {
             if (ROB_Table[i].st == None||ROB_Table[i].st == Commit) {//还没有载入语句
                 if (!Ins_Cache::cache.empty()&&!Reg_status::Busy_pc) {//如果非空就可以载入一条指令，由于是最后在None的位置载入，所以jump指令的处理必定会在载入之前，可以及时封存载入(clear掉),但我还是写上与Busy_pc相关的逻辑吧
                     const auto [fst, snd]=Ins_Cache::read();
+                    ROB_Table[i]=inst{};
                     ROB_Table[i].pc=snd;
                     ROB_Table[i].ins=fst;
                     // if (ROB_Table[i].ins==0x00f54533) {

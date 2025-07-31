@@ -31,6 +31,7 @@ struct inst {
     int pc{-1}, rd{}, rs1{}, rs2{},rs1_val{},rs2_val{}, imm{};
     State st{};
     int value{};
+    bool broadcast{};
     inst();
     explicit inst(const instructions& a);
 };

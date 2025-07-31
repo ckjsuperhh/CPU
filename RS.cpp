@@ -28,6 +28,14 @@ int RS::launch(inst &ins, const int i) {
             op[0]=ins.op;
             Dest[0]=i;
             Read_regs::execute(ins,Vj[0],Vk[0],Qj[0],Qk[0],pj[0],pk[0]);//读取Reg的值,并且修改RS表
+            if (Qj[0]!=-1&& ROB::ROB_Table[Qj[0]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vj[0]=ROB::ROB_Table[Qj[0]].value;
+                Qj[0]=-1;
+            }
+            if (Qk[0]!=-1&& ROB::ROB_Table[Qk[0]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vk[0]=ROB::ROB_Table[Qk[0]].value;
+                Qk[0]=-1;
+            }
             if (ins.op=="lb"||ins.op=="lbu"||ins.op=="lh"||ins.op=="lhu"||ins.op=="lw") {
                 Write_regs::mark_Reg(ins.rd,i);
             }//Launch的同时我也应该把RF修改掉
@@ -41,6 +49,14 @@ int RS::launch(inst &ins, const int i) {
             op[1]=ins.op;
             Dest[1]=i;
             Read_regs::execute(ins,Vj[1],Vk[1],Qj[1],Qk[1],pj[1],pk[1]);
+            if (Qj[1]!=-1&& ROB::ROB_Table[Qj[1]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vj[1]=ROB::ROB_Table[Qj[1]].value;
+                Qj[1]=-1;
+            }
+            if (Qk[1]!=-1&& ROB::ROB_Table[Qk[1]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vk[1]=ROB::ROB_Table[Qk[1]].value;
+                Qk[1]=-1;
+            }
             if (ins.op=="lb"||ins.op=="lbu"||ins.op=="lh"||ins.op=="lhu"||ins.op=="lw") {
                 Write_regs::mark_Reg(ins.rd,i);
             }
@@ -59,6 +75,14 @@ int RS::launch(inst &ins, const int i) {
             op[2]=ins.op;
             Dest[2]=i;
             Read_regs::execute(ins,Vj[2],Vk[2],Qj[2],Qk[2],pj[2],pk[2]);//读取Reg的值,并且修改RS表
+            if (Qj[2]!=-1&& ROB::ROB_Table[Qj[2]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vj[2]=ROB::ROB_Table[Qj[2]].value;
+                Qj[2]=-1;
+            }
+            if (Qk[2]!=-1&& ROB::ROB_Table[Qk[2]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vk[2]=ROB::ROB_Table[Qk[2]].value;
+                Qk[2]=-1;
+            }
             Write_regs::mark_Reg(ins.rd,i);
             // std::cerr<<"here are the RS:\n";
             // show(2);
@@ -70,6 +94,14 @@ int RS::launch(inst &ins, const int i) {
             op[3]=ins.op;
             Dest[3]=i;
             Read_regs::execute(ins,Vj[3],Vk[3],Qj[3],Qk[3],pj[3],pk[3]);
+            if (Qj[3]!=-1&& ROB::ROB_Table[Qj[3]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vj[3]=ROB::ROB_Table[Qj[3]].value;
+                Qj[3]=-1;
+            }
+            if (Qk[3]!=-1&& ROB::ROB_Table[Qk[3]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vk[3]=ROB::ROB_Table[Qk[3]].value;
+                Qk[3]=-1;
+            }
             Write_regs::mark_Reg(ins.rd,i);
             // std::cerr<<"here are the RS:\n";
             // show(3);
@@ -86,6 +118,14 @@ int RS::launch(inst &ins, const int i) {
             op[4]=ins.op;
             Dest[4]=i;
             Read_regs::execute(ins,Vj[4],Vk[4],Qj[4],Qk[4],pj[4],pk[4]);//读取Reg的值,并且修改RS表
+            if (Qj[4]!=-1&& ROB::ROB_Table[Qj[4]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vj[4]=ROB::ROB_Table[Qj[4]].value;
+                Qj[4]=-1;
+            }
+            if (Qk[4]!=-1&& ROB::ROB_Table[Qk[4]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vk[4]=ROB::ROB_Table[Qk[4]].value;
+                Qk[4]=-1;
+            }
             if (ins.op=="jal"||ins.op=="jalr") {
                 Write_regs::mark_Reg(ins.rd,i);
             }
@@ -100,6 +140,14 @@ int RS::launch(inst &ins, const int i) {
             op[5]=ins.op;
             Dest[5]=i;
             Read_regs::execute(ins,Vj[5],Vk[5],Qj[5],Qk[5],pj[5],pk[5]);
+            if (Qj[5]!=-1&& ROB::ROB_Table[Qj[5]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vj[5]=ROB::ROB_Table[Qj[5]].value;
+                Qj[5]=-1;
+            }
+            if (Qk[5]!=-1&& ROB::ROB_Table[Qk[5]].broadcast==true) {//没有写回寄存器但是已经被广播过了
+                Vk[5]=ROB::ROB_Table[Qk[5]].value;
+                Qk[5]=-1;
+            }
             if (ins.op=="jal"||ins.op=="jalr") {
                 Write_regs::mark_Reg(ins.rd,i);
             }
@@ -113,6 +161,7 @@ int RS::launch(inst &ins, const int i) {
     }
     return -1;
 };
+
 
 void RS::clear(const int i) {//把第i行对应指令删除
     if (i<0||i>=6) {
