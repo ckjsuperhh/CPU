@@ -54,6 +54,7 @@ void predictor::get_busy(const int i) {//当读入jump语句的时候，记得�
 
 void predictor::add_tail() {
     tail++;
+    tail%=500;
 }
 void predictor::reserve_data(int rd, int value) {
     RF_data[rd]=value;
