@@ -3,9 +3,8 @@
 //
 #include "Predictor.h"
 void predictor::flush() {
-    predictor::busy=false;
+    busy=false;
     head=tail=-1;
-    success_times--;
     for (int i=0;i<32;i++) {//RF的修改
         Register::regs[i]=RF_data[i];
         Reg_status::Reorder[i]=-1;
@@ -31,7 +30,6 @@ void predictor::flush() {
 }
 void predictor::get_busy(const int i) {//当读入jump语句的时候，记得变忙
     predicting_times++;
-    success_times++;
     //如果没有占住位置，那么我就开始预测
     busy=true;
     head=tail=i;
@@ -44,6 +42,15 @@ void predictor::add_tail() {
 }
 void predictor::reserve_data(int rd, int value) {
     RF_data[rd]=value;
+}
+void predictor::clean_predicting() {
+    success_times++;
+    for (int i=head+1;i<500;i++) {
+        ROB::ROB_Table[i].predicting=false;
+    }
+    for (int i=0;i<=tail;i++) {
+        ROB::ROB_Table[i].predicting=false;
+    }
 }
 //我的想法是一旦读入了第二个jump指令，我就不再往后预测，相当于bubble，直到jump的ALU运行完了，我才能发现自己预测是否正确,对于jal和jalr这类直接跳转的指令我们就直接bubble,保持现状(如果是在预测期间遇到了jal和jalr了我们也直接停止)
 //还有load相关的指令，我不认为可以执行，要不就不执行?

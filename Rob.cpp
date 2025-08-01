@@ -24,7 +24,7 @@ inst ROB::ROB_Table[500]{};
 int ROB::code[500]{};
 int ROB::MOD=500;
 inline bool ok=0;
-inline bool specific_stop=0;
+bool ROB::specific_stop=0;
 // inst构造函数实现
 inst::inst()= default;
 inst::inst(const instructions& a)
@@ -131,6 +131,9 @@ bool ROB::execute_5() {
                         if (ROB_Table[i].ins==0x0ff00513) {
                                 std::cout<<std::dec<<(Register::regs[10]&0xFF);
                             std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
+                            if (predictor::predicting_times!=0) {
+
+                            }
                             exit(0);
                         }
                         Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);

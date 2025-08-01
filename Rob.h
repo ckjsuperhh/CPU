@@ -45,6 +45,8 @@ public:
     static int code[500];
     static int MOD;
 
+    static bool specific_stop;
+
     static bool execute_5();
     static bool execute_1();
     static std::unordered_map<int,ticker_mem> read_mem;

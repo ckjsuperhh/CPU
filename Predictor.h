@@ -19,5 +19,7 @@ public:
     static void get_busy(const int i);
     static void add_tail();
     static void reserve_data(int rd, int value);
+
+    static void clean_predicting();
 };
 #endif //PREDICTOR_H

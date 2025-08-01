@@ -116,7 +116,10 @@ public:
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
                 predictor::flush();
+            }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
+                predictor::clean_predicting();
             }
+            ROB::specific_stop=false;
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bge") {
             if (ins.rs1_val>=ins.rs2_val) {
@@ -124,7 +127,10 @@ public:
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
                 predictor::flush();
+            }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
+                predictor::clean_predicting();
             }
+            ROB::specific_stop=false;
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bgeu") {
             if (static_cast<uint32_t>(ins.rs1_val)>=static_cast<uint32_t>(ins.rs2_val)) {
@@ -132,7 +138,10 @@ public:
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
                 predictor::flush();
+            }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
+                predictor::clean_predicting();
             }
+            ROB::specific_stop=false;
             Reg_status::Busy_pc=false;
         } else if (ins.op == "blt") {
             if (ins.rs1_val<ins.rs2_val) {
@@ -140,7 +149,10 @@ public:
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
                 predictor::flush();
+            }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
+                predictor::clean_predicting();
             }
+            ROB::specific_stop=false;
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bltu") {
             if (static_cast<uint32_t>(ins.rs1_val)<static_cast<uint32_t>(ins.rs2_val)) {
@@ -148,7 +160,10 @@ public:
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
                 predictor::flush();
+            }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
+                predictor::clean_predicting();
             }
+            ROB::specific_stop=false;
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bne") {
             if (ins.rs1_val!=ins.rs2_val) {//预测失败，直接flush
@@ -156,7 +171,10 @@ public:
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);//clear顺带已经修改过pc的值了(不然内部的值已经维护好了，就是pc读到的位置+4)
                 predictor::flush();
+            }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
+                predictor::clean_predicting();
             }
+            ROB::specific_stop=false;
             Reg_status::Busy_pc=false;
         } else if (ins.op == "jal") {
             ins.value=ins.pc+4;
