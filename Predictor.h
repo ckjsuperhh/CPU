@@ -17,18 +17,13 @@ public:
         head=tail=-1;
 
     }
-    static bool get_busy(const int i) {//当读入jump语句的时候，记得变忙
-if (!busy) {//如果没有占住位置，那么我就开始预测
+    static void get_busy(const int i) {//当读入jump语句的时候，记得变忙
+//如果没有占住位置，那么我就开始预测
     busy=true;
-        head=i;
-
-    return true;
-}
-//不然就开始bubble直到预测结束(正确的话我就能继续运行，否则不能)——那么我是不是需要在语句后面加一个值卡着我的
-//那么我就拒绝导入(外部写这个逻辑)
+        head=tail=i;
 
 
-return false;
+
     }
     static void add_tail() {
         tail++;

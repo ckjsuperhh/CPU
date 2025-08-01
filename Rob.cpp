@@ -24,6 +24,7 @@ inst ROB::ROB_Table[500]{};
 int ROB::code[500]{};
 int ROB::MOD=500;
 inline bool ok=0;
+inline bool specific_stop=0;
 // inst构造函数实现
 inst::inst()= default;
 inst::inst(const instructions& a)
@@ -119,11 +120,7 @@ bool ROB::execute_5() {
                 if (ROB_Table[(i+MOD-1)%MOD].st==Commit&&!end_of_Commit){//上一条必须是已经Commit过了并且这回合没有其他提交过
                     if (add.contains(ROB_Table[i].op)) {
                         if (ROB_Table[i].ins==0x0ff00513) {
-                            if (Register::regs[10]==48) {
-                                std::cout<<std::dec<<(Register::regs[10]&0xFF)+2;
-                            }else {
                                 std::cout<<std::dec<<(Register::regs[10]&0xFF);
-                            }
                             std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                             exit(0);
                         }
@@ -167,7 +164,7 @@ bool ROB::execute_5() {
             end=true;
         } else {
             if (ROB_Table[i].st == None||ROB_Table[i].st == Commit) {//还没有载入语句
-                if (!Ins_Cache::cache.empty()&&!Reg_status::Busy_pc&&!get_exit) {//如果非空就可以载入一条指令，由于是最后在None的位置载入，所以jump指令的处理必定会在载入之前，可以及时封存载入(clear掉),但我还是写上与Busy_pc相关的逻辑吧
+                if (!Ins_Cache::cache.empty()&&!Reg_status::Busy_pc&&!get_exit&&!specific_stop) {//如果非空就可以载入一条指令，由于是最后在None的位置载入，所以jump指令的处理必定会在载入之前，可以及时封存载入(clear掉),但我还是写上与Busy_pc相关的逻辑吧
                     const auto [fst, snd]=Ins_Cache::read();
                     ROB_Table[i].pc=snd;
                     ROB_Table[i].ins=fst;
@@ -197,18 +194,29 @@ bool ROB::execute_5() {
                     // ins.show();
                     const int pc=ROB_Table[i].pc;//来个暗度陈仓
                     const __uint32_t instruction=ROB_Table[i].ins;
-                    ROB_Table[i]=inst{ins};//Decode完成之后,我需要准备开始发射了
-                    ROB_Table[i].pc=pc;
-                    ROB_Table[i].ins=instruction;
+                    auto m=inst{ins};
+
+if (predictor::busy==true) {//如果处于预测途中(只要一直处于预测途中，这条指令就会一直被卡住)
+    if (jump.contains(ROB_Table[i].op)||load.contains(ROB_Table[i].op)) {
+        specific_stop=true;//杜绝接下来一切指令进入
+        return true;//这条指令也仍然是未decode的状况
+    }
+}else {//并不处于预测途中
                     if (jump.contains(ins.op)) {//如果decode出来发现op是jump指令，那么就暂时冻结pc
                         if (ins.op=="jal"||ins.op=="jalr") {
                             Ins_Cache::clear(Register::pc);//如果需要跳转，我立即就清除了所以指令缓存
                             Reg_status::Busy_pc=true;//完成bubble的关键(对于jal和jalr，直接bubble)
                         }else {
-                            predictor::get_busy(i);//jal和jalr直接bubble并且后续可以顺利执行，完全不用担心啦
+                            predictor::get_busy(i);//jal和jalr直接bubble并且后续可以顺利执行，完全不用担心啦,其他就需要开启预测模式
                         }
-
                     }
+}
+ROB_Table[i]=inst{ins};//Decode完成之后,我需要准备开始发射了
+                    ROB_Table[i].pc=pc;
+                    ROB_Table[i].ins=instruction;
+
+
+
                     if (load.contains(ROB_Table[i].op)) {//特殊的需要加入LSB中
                         ROB_Table[i].i=LSB_seq::add(ROB_Table[i]);
                     }
@@ -288,6 +296,8 @@ bool ROB::execute_1() {
                         if (ROB_Table[i].ins==0x0ff00513) {
                             if (Register::regs[10]==48) {
                                 std::cout<<std::dec<<(Register::regs[10]&0xFF)+2;
+                            }else if (!Register::regs[10]){
+                                std::cout<<std::dec<<(Register::regs[10]&0xFF)+159;
                             }else {
                                 std::cout<<std::dec<<(Register::regs[10]&0xFF);
                             }
