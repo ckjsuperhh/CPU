@@ -170,6 +170,9 @@ inline void decoder(const __uint32_t ins, std::string &op, int &rd, int &rs1, in
             rs1 = (ins >> 15) & 0x1F;
             imm_4_0 = (ins >> 7) & 0x1F; // [11:7]
             imm = (imm_11_5 << 5) | imm_4_0;
+            if (imm & 0x800) { // 检查12位的最高位（bit11）是否为1
+                imm |= 0xFFFFF000; // 高20位填充1，完成符号扩展
+            }
             switch (const auto funct3 = (ins >> 12) & 7; funct3) {
                 case 0b000:
                     op = "sb";
