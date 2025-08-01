@@ -30,7 +30,7 @@ public:
             }
         }
     }
-    static void get_busy(const int i,const int rd) {//当读入jump语句的时候，记得变忙
+    static void get_busy(const int i) {//当读入jump语句的时候，记得变忙
         predicting_times++;
         success_times++;
 //如果没有占住位置，那么我就开始预测
