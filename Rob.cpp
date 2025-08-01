@@ -62,6 +62,9 @@ bool ROB::execute_5() {
                 end=true;
                 if (!load.contains(ROB_Table[i].op)) {
                     RS::clear(code[i]);
+                    if (ROB_Table[i].predicting) {//如果处在预测过程中，那么也要消除掉预测中的RS_occupy
+                        predictor::RS_occupy[code[i]]=false;
+                    }
                     if (jump.contains(ROB_Table[i].op)) {
                         Reg_status::Busy_pc=false;//这一步结束之后,Busy_pc不再忙碌(由于之前的bubble逻辑，这行指令之后必定不会有任何指令的输入)
                     }
@@ -87,6 +90,9 @@ bool ROB::execute_5() {
                         exit(0);
                     }
                     Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
+                    if (predictor::busy) {//如果正处于预测过程中，那么所有的提交都需要上交RF_data便于恢复数据
+                        predictor::reserve_data(ROB_Table[i].rd,ROB_Table[i].value);
+                    }
                     ROB_Table[i].st=Commit;
                     head++;
                     // std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
@@ -107,6 +113,9 @@ bool ROB::execute_5() {
                                 CDB::add(i,ROB_Table[i].value);;
                             }
                             RS::clear(code[i]);
+                            if (ROB_Table[i].predicting) {//如果处在预测过程中，那么也要消除掉预测中的RS_occupy
+                                predictor::RS_occupy[code[i]]=false;
+                            }
                         }
                     }
                 }else {//剩下的jump指令还没有处理
@@ -125,6 +134,9 @@ bool ROB::execute_5() {
                             exit(0);
                         }
                         Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
+                        if (predictor::busy) {//如果正处于预测过程中，那么所有的提交都需要上交RF_data便于恢复数据
+                            predictor::reserve_data(ROB_Table[i].rd,ROB_Table[i].value);
+                        }
                         ROB_Table[i].st=Commit;
                         head++;
                         // std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
@@ -142,10 +154,16 @@ bool ROB::execute_5() {
                                     CDB::add(i,ROB_Table[i].value);;
                                 }
                                 RS::clear(code[i]);
+                                if (ROB_Table[i].predicting) {//如果处在预测过程中，那么也要消除掉预测中的RS_occupy
+                                    predictor::RS_occupy[code[i]]=false;
+                                }
                             }
                         }
                     }else {
                         Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
+                        if (predictor::busy) {//如果正处于预测过程中，那么所有的提交都需要上交RF_data便于恢复数据
+                            predictor::reserve_data(ROB_Table[i].rd,ROB_Table[i].value);
+                        }
                         ROB_Table[i].st=Commit;
                         head++;
                         // std::cerr<<std::hex<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
@@ -156,6 +174,9 @@ bool ROB::execute_5() {
         } else if (ROB_Table[i].st == Write) {//读写内存和寄存器,与LSB有关，我现在先不写
             if ((i==0&&head==0)||(ROB_Table[(i-1+MOD)%MOD].st==Commit&&!end_of_Commit)) {
                 Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
+                if (predictor::busy) {//如果正处于预测过程中，那么所有的提交都需要上交RF_data便于恢复数据
+                    predictor::reserve_data(ROB_Table[i].rd,ROB_Table[i].value);
+                }
                 ROB_Table[i].st=Commit;
                 head++;
                 // std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
@@ -197,11 +218,12 @@ bool ROB::execute_5() {
                     auto m=inst{ins};
 
 if (predictor::busy==true) {//如果处于预测途中(只要一直处于预测途中，这条指令就会一直被卡住)
-    if (jump.contains(ROB_Table[i].op)||load.contains(ROB_Table[i].op)) {
-        specific_stop=true;//杜绝接下来一切指令进入
-        return true;//这条指令也仍然是未decode的状况
-    }
-}else {//并不处于预测途中
+            if (jump.contains(ROB_Table[i].op)||load.contains(ROB_Table[i].op)) {
+                specific_stop=true;//杜绝接下来一切指令从Cache中读取
+                return true;//这条指令也仍然是未decode的状况
+            }
+            predictor::add_tail();
+            }else {//并不处于预测途中
                     if (jump.contains(ins.op)) {//如果decode出来发现op是jump指令，那么就暂时冻结pc
                         if (ins.op=="jal"||ins.op=="jalr") {
                             Ins_Cache::clear(Register::pc);//如果需要跳转，我立即就清除了所以指令缓存
@@ -210,13 +232,13 @@ if (predictor::busy==true) {//如果处于预测途中(只要一直处于预测�
                             predictor::get_busy(i);//jal和jalr直接bubble并且后续可以顺利执行，完全不用担心啦,其他就需要开启预测模式
                         }
                     }
-}
-ROB_Table[i]=inst{ins};//Decode完成之后,我需要准备开始发射了
+                }
+                    ROB_Table[i]=inst{ins};//Decode完成之后,我需要准备开始发射了
+                    if (predictor::busy==true) {
+                        ROB_Table[i].predicting=true;//在预测期间的指令统一加上这个predicting
+                    }
                     ROB_Table[i].pc=pc;
                     ROB_Table[i].ins=instruction;
-
-
-
                     if (load.contains(ROB_Table[i].op)) {//特殊的需要加入LSB中
                         ROB_Table[i].i=LSB_seq::add(ROB_Table[i]);
                     }
@@ -268,17 +290,14 @@ bool ROB::execute_1() {
             if (i==0&&head==0) {//特判，因为没有上一条，可以直接运行
                 if (add.contains(ROB_Table[i].op)) {
                     if (ROB_Table[i].ins==0x0ff00513) {
-                        if (Register::regs[10]==48) {
-                            std::cout<<std::dec<<(Register::regs[10]&0xFF)+2;
-                        }else if (!Register::regs[10]){
-                            std::cout<<std::dec<<(Register::regs[10]&0xFF)+159;
-                        }else {
                             std::cout<<std::dec<<(Register::regs[10]&0xFF);
-                        }
                         std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                         exit(0);
                     }
                     Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
+                    if (predictor::busy) {//如果正处于预测过程中，那么所有的提交都需要上交RF_data便于恢复数据
+                        predictor::reserve_data(ROB_Table[i].rd,ROB_Table[i].value);
+                    }
                     ROB_Table[i].st=Commit;
                     head++;
                 }else if (load.contains(ROB_Table[i].op)) {//其他情况以后再进行尝试
@@ -300,13 +319,7 @@ bool ROB::execute_1() {
                 if (ROB_Table[(i+MOD-1)%MOD].st==Commit){//上一条必须是已经Commit过了并且这回合没有其他提交过
                     if (add.contains(ROB_Table[i].op)) {
                         if (ROB_Table[i].ins==0x0ff00513) {
-                            if (Register::regs[10]==48) {
-                                std::cout<<std::dec<<(Register::regs[10]&0xFF)+2;
-                            }else if (!Register::regs[10]){
-                                std::cout<<std::dec<<(Register::regs[10]&0xFF)+159;
-                            }else {
-                                std::cout<<std::dec<<(Register::regs[10]&0xFF);
-                            }
+                            std::cout<<std::dec<<(Register::regs[10]&0xFF);
                             std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                             exit(0);
                         }

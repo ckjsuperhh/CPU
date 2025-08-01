@@ -33,6 +33,7 @@ struct inst {
     int value{};
     bool broadcast{};
     inst();
+    bool predicting{};//true则是处于predict途中载入的指令
     explicit inst(const instructions& a);
 };
 

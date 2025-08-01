@@ -8,6 +8,7 @@
 
 #include "Decoder.h"
 #include "Ins_Cache.h"
+#include "Predictor.h"
 #include "RF.h"
 #include "Rob.h"
 
@@ -114,6 +115,7 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
+                predictor::flush();
             }
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bge") {
@@ -121,6 +123,7 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
+                predictor::flush();
             }
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bgeu") {
@@ -128,6 +131,7 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
+                predictor::flush();
             }
             Reg_status::Busy_pc=false;
         } else if (ins.op == "blt") {
@@ -135,6 +139,7 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
+                predictor::flush();
             }
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bltu") {
@@ -142,13 +147,15 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
+                predictor::flush();
             }
             Reg_status::Busy_pc=false;
         } else if (ins.op == "bne") {
-            if (ins.rs1_val!=ins.rs2_val) {
+            if (ins.rs1_val!=ins.rs2_val) {//预测失败，直接flush
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);//clear顺带已经修改过pc的值了(不然内部的值已经维护好了，就是pc读到的位置+4)
+                predictor::flush();
             }
             Reg_status::Busy_pc=false;
         } else if (ins.op == "jal") {

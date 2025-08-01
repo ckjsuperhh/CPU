@@ -1,5 +1,6 @@
 #include "RS.h"
 
+#include "Predictor.h"
 #include "Rob.h"
 //
 // Created by ckjsuperhh6602 on 25-7-24.
@@ -50,6 +51,9 @@ int RS::launch(inst &ins, const int i) {
             if (ins.op=="lb"||ins.op=="lbu"||ins.op=="lh"||ins.op=="lhu"||ins.op=="lw") {
                 Write_regs::mark_Reg(ins.rd,i);
             }//Launch的同时我也应该把RF修改掉
+            if (ins.predicting) {//如果这个语句处于预测阶段,需要维护RS
+                predictor::RS_occupy[0]=true;
+            }
             // std::cerr<<"here are the RS:\n";
             // show(0);
             return 0;
@@ -80,6 +84,9 @@ int RS::launch(inst &ins, const int i) {
             }
             if (ins.op=="lb"||ins.op=="lbu"||ins.op=="lh"||ins.op=="lhu"||ins.op=="lw") {
                 Write_regs::mark_Reg(ins.rd,i);
+            }
+            if (ins.predicting) {//如果这个语句处于预测阶段,需要维护RS
+                predictor::RS_occupy[1]=true;
             }
             // std::cerr<<"here are the RS:\n";
             // show(1);
@@ -115,6 +122,9 @@ int RS::launch(inst &ins, const int i) {
                 }
             }
             Write_regs::mark_Reg(ins.rd,i);
+            if (ins.predicting) {//如果这个语句处于预测阶段,需要维护RS
+                predictor::RS_occupy[2]=true;
+            }
             // std::cerr<<"here are the RS:\n";
             // show(2);
             return 2;
@@ -142,6 +152,9 @@ int RS::launch(inst &ins, const int i) {
                 }else if (pk[3]== Posi::rs2) {
                     ins.rs2_val=Vk[3];
                 }
+            }
+            if (ins.predicting) {//如果这个语句处于预测阶段,需要维护RS
+                predictor::RS_occupy[3]=true;
             }
             Write_regs::mark_Reg(ins.rd,i);
             // std::cerr<<"here are the RS:\n";
@@ -180,7 +193,9 @@ int RS::launch(inst &ins, const int i) {
             if (ins.op=="jal"||ins.op=="jalr") {
                 Write_regs::mark_Reg(ins.rd,i);
             }
-
+            if (ins.predicting) {//如果这个语句处于预测阶段,需要维护RS
+                predictor::RS_occupy[4]=true;
+            }
             // std::cerr<<"here are the RS:\n";
             // show(4);
             return 4;
@@ -211,6 +226,9 @@ int RS::launch(inst &ins, const int i) {
             }
             if (ins.op=="jal"||ins.op=="jalr") {
                 Write_regs::mark_Reg(ins.rd,i);
+            }
+            if (ins.predicting) {//如果这个语句处于预测阶段,需要维护RS
+                predictor::RS_occupy[5]=true;
             }
             // std::cerr<<"here are the RS:\n";
             // show(5);
