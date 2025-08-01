@@ -120,7 +120,6 @@ public:
                 predictor::clean_predicting();
             }
             ROB::specific_stop=false;
-            Reg_status::Busy_pc=false;
         } else if (ins.op == "bge") {
             if (ins.rs1_val>=ins.rs2_val) {
                 ins.value=ins.pc+ins.imm;
@@ -131,7 +130,6 @@ public:
                 predictor::clean_predicting();
             }
             ROB::specific_stop=false;
-            Reg_status::Busy_pc=false;
         } else if (ins.op == "bgeu") {
             if (static_cast<uint32_t>(ins.rs1_val)>=static_cast<uint32_t>(ins.rs2_val)) {
                 ins.value=ins.pc+ins.imm;
@@ -142,7 +140,6 @@ public:
                 predictor::clean_predicting();
             }
             ROB::specific_stop=false;
-            Reg_status::Busy_pc=false;
         } else if (ins.op == "blt") {
             if (ins.rs1_val<ins.rs2_val) {
                 ins.value=ins.pc+ins.imm;
@@ -153,7 +150,6 @@ public:
                 predictor::clean_predicting();
             }
             ROB::specific_stop=false;
-            Reg_status::Busy_pc=false;
         } else if (ins.op == "bltu") {
             if (static_cast<uint32_t>(ins.rs1_val)<static_cast<uint32_t>(ins.rs2_val)) {
                 ins.value=ins.pc+ins.imm;
@@ -164,7 +160,6 @@ public:
                 predictor::clean_predicting();
             }
             ROB::specific_stop=false;
-            Reg_status::Busy_pc=false;
         } else if (ins.op == "bne") {
             if (ins.rs1_val!=ins.rs2_val) {//预测失败，直接flush
                 ins.value=ins.pc+ins.imm;
@@ -175,7 +170,6 @@ public:
                 predictor::clean_predicting();
             }
             ROB::specific_stop=false;
-            Reg_status::Busy_pc=false;
         } else if (ins.op == "jal") {
             ins.value=ins.pc+4;
             Register::pc=ins.pc+ins.imm;

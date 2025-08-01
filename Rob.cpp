@@ -19,7 +19,7 @@ std::unordered_set<std::string> load={"lb","lbu","lh","lhu","lw","sb","sh","sw"}
 std::unordered_set<std::string> add={"auipc","lui","ebreak","ecall","add","sub","and","or","xor","sll","srl","sra","slt","sltu","addi","andi","ori","xori","slli","srli","srai","slti","sltiu"};
 std::unordered_set<std::string> jump={"beq","bge","bgeu","blt","bltu","bne","jal","jalr",};
 int ROB::head = 0;
-int ROB::tail = 1;
+int ROB::tail = 0;
 inst ROB::ROB_Table[500]{};
 int ROB::code[500]{};
 int ROB::MOD=500;
@@ -225,7 +225,7 @@ bool ROB::execute_5() {
                     ins.show();
                     const int pc=ROB_Table[i].pc;//来个暗度陈仓
                     const __uint32_t instruction=ROB_Table[i].ins;
-                    auto m=inst{ins};
+                    ROB_Table[i].op=ins.op;//后面我便于知晓到底是那种指令，op还是需要的
 
 if (predictor::busy==true) {//如果处于预测途中(只要一直处于预测途中，这条指令就会一直被卡住)
             if (jump.contains(ROB_Table[i].op)||load.contains(ROB_Table[i].op)) {

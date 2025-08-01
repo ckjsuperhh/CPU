@@ -38,6 +38,7 @@ void predictor::flush() {
         }
     }
     head=tail=-1;
+    Reg_status::Busy_pc=false;
 }
 
 void predictor::get_busy(const int i) {//当读入jump语句的时候，记得变忙
@@ -58,7 +59,12 @@ void predictor::reserve_data(int rd, int value) {
     RF_data[rd]=value;
 }
 void predictor::clean_predicting() {
+    busy=false;
+    std::cerr<<"predict right!----"<<head<<"~"<<tail<<std::endl;
     success_times++;
+    if ((head!=tail&&ROB::ROB_Table[tail].op!="jal"&&ROB::ROB_Table[tail].op!="jalr")||(head==tail)) {
+        Reg_status::Busy_pc=false;
+    }//bne等相关跳转结束后，可能会修正busy_pc导致原有的jal的跳转bubble失效，所以需要加入这一条
     for (int i=head+1;i<500;i++) {
         ROB::ROB_Table[i].predicting=false;
     }
