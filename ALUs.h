@@ -115,9 +115,17 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
-                predictor::flush();
+                if (predictor::busy) {
+                    predictor::flush();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
-                predictor::clean_predicting();
+                if (predictor::busy) {
+                    predictor::clean_predicting();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }
             ROB::specific_stop=false;
         } else if (ins.op == "bge") {
@@ -125,9 +133,17 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
-                predictor::flush();
+                if (predictor::busy) {
+                    predictor::flush();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
-                predictor::clean_predicting();
+                if (predictor::busy) {
+                    predictor::clean_predicting();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }
             ROB::specific_stop=false;
         } else if (ins.op == "bgeu") {
@@ -135,9 +151,17 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
-                predictor::flush();
+                if (predictor::busy) {
+                    predictor::flush();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
-                predictor::clean_predicting();
+                if (predictor::busy) {
+                    predictor::clean_predicting();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }
             ROB::specific_stop=false;
         } else if (ins.op == "blt") {
@@ -145,9 +169,17 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
-                predictor::flush();
+                if (predictor::busy) {
+                    predictor::flush();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
-                predictor::clean_predicting();
+                if (predictor::busy) {
+                     predictor::clean_predicting();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }
             ROB::specific_stop=false;
         } else if (ins.op == "bltu") {
@@ -155,9 +187,18 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);
-                predictor::flush();
+                if (predictor::busy) {
+                    predictor::flush();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
-                predictor::clean_predicting();
+                if (predictor::busy) {
+                    predictor::clean_predicting();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
+
             }
             ROB::specific_stop=false;
         } else if (ins.op == "bne") {
@@ -165,9 +206,18 @@ public:
                 ins.value=ins.pc+ins.imm;
                 Register::pc=ins.value;
                 Ins_Cache::clear(Register::pc);//clear顺带已经修改过pc的值了(不然内部的值已经维护好了，就是pc读到的位置+4)
-                predictor::flush();
+                if (predictor::busy) {
+                    predictor::flush();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
+
             }else {//不然对于如今的指令我还需要清除predicting过程中受到的限制
-                predictor::clean_predicting();
+                if (predictor::busy) {
+                    predictor::clean_predicting();
+                }else {
+                    Reg_status::Busy_pc=0;
+                }
             }
             ROB::specific_stop=false;
         } else if (ins.op == "jal") {
