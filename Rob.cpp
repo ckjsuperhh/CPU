@@ -97,7 +97,7 @@ bool ROB::execute_5() {
                     head++;
                     std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                     if (ROB_Table[i].pc==0x1008) {//当交xor的时候，一定是函数调用成功读取过的
-                            std::cout<<"函数调用:"<<Register::regs[10]<<std::endl;
+                            // std::cout<<"函数调用:"<<Register::regs[10]<<std::endl;
                         }
                     end_of_Commit=true;
                 }else if (load.contains(ROB_Table[i].op)) {//其他情况以后再进行尝试
@@ -132,7 +132,7 @@ bool ROB::execute_5() {
                                 std::cout<<std::dec<<(Register::regs[10]&0xFF);
                             std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                             if (predictor::predicting_times!=0) {
-
+                                std::cerr<<static_cast<double>(predictor::success_times)/predictor::predicting_times<<std::endl;
                             }
                             exit(0);
                         }
@@ -144,7 +144,7 @@ bool ROB::execute_5() {
                         head++;
                         std::cerr<<std::dec<<i<<"-----Commiting:"<<ROB_Table[i].op<<std::endl;
                         if (ROB_Table[i].pc==0x1008) {//当交xor的时候，一定是函数调用成功读取过的
-                            std::cout<<"函数调用:"<<Register::regs[10]<<std::endl;
+                            // std::cout<<"函数调用:"<<Register::regs[10]<<std::endl;
                         }
                         end_of_Commit=true;
                     }else if (load.contains(ROB_Table[i].op)) {
