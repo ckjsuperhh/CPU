@@ -21,4 +21,5 @@ add_executable(code main.cpp
         CDB.cpp
         Ins_Cache.cpp
         LSB.cpp
-        clock.cpp)
+        clock.cpp
+        predictor.cpp)
