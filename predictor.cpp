@@ -2,9 +2,15 @@
 // Created by ckjsuperhh6602 on 25-8-1.
 //
 #include "Predictor.h"
+inline int delta(int a,int b) {
+    if (a<=b) {
+        return b-a;
+    }
+    return 500-a+b;
+}
 void predictor::flush() {
     busy=false;
-    head=tail=-1;
+
     for (int i=0;i<32;i++) {//RF的修改
         Register::regs[i]=RF_data[i];
         Reg_status::Reorder[i]=-1;
@@ -15,19 +21,25 @@ void predictor::flush() {
             RS::clear(i);
         }
     }
+    ROB::tail-=delta(head,tail);
     if (head<=tail) {
         for (int i=head+1;i<=tail;i++) {
+            std::cerr<<std::dec<<i<<"-----Flushing:(pc)"<<std::hex<<ROB::ROB_Table[i].pc<<" (ins)"<<ROB::ROB_Table[i].ins<<std::endl;
             ROB::ROB_Table[i]=inst{};
         }
     }else {
         for (int i=head+1;i<500;i++) {
-            ROB::ROB_Table[i]=inst{};
+            std::cerr<<std::dec<<i<<"-----Flushing:(pc)"<<std::hex<<ROB::ROB_Table[i].pc<<" (ins)"<<ROB::ROB_Table[i].ins<<std::endl;
+           ROB::ROB_Table[i]=inst{};
         }
         for (int i=0;i<=tail;i++) {
-            ROB::ROB_Table[i]=inst{};
+           std::cerr<<std::dec<<i<<"-----Flushing:(pc)"<<std::hex<<ROB::ROB_Table[i].pc<<" (ins)"<<ROB::ROB_Table[i].ins<<std::endl;
+             ROB::ROB_Table[i]=inst{};
         }
     }
+    head=tail=-1;
 }
+
 void predictor::get_busy(const int i) {//当读入jump语句的时候，记得变忙
     predicting_times++;
     //如果没有占住位置，那么我就开始预测
@@ -36,7 +48,9 @@ void predictor::get_busy(const int i) {//当读入jump语句的时候，记得�
     for (int i1=0;i1<32;i1++) {//复制一次data
         RF_data[i1]=Register::regs[i1];
     }
+
 }
+
 void predictor::add_tail() {
     tail++;
 }
