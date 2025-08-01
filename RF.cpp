@@ -6,8 +6,8 @@
 #include "RS.h"
 
 // ==== Register 静态成员初始化 ====
-uint32_t Register::regs[32] = {0};
-uint32_t Register::Rename_regs[32] = {0};
+uint32_t Register::regs[32] = {};
+uint32_t Register::Rename_regs[32] = {};
 std::string Register::reg_num[32] = {
     "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
     "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",

@@ -39,7 +39,7 @@ bool clock::execute_once() {
     CDB::execute();
     ticker++;
     Ins_Cache::check();//每一个时钟都要检查一下指令缓存有没有做
-    return ROB::execute_5();//很明显，只要有运行，end就会是true，那么就要继续进行下一个回合的运行
+    return ROB::execute_1();//很明显，只要有运行，end就会是true，那么就要继续进行下一个回合的运行
 }
 
 int clock::ticker=0;

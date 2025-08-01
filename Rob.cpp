@@ -8,6 +8,7 @@
 #include "Rob.h"
 
 #include "clock.h"
+#include "Predictor.h"
 #include "RS.h"
 std::unordered_set<std::string> read_mem = {"lb", "lbu", "lh", "lhu", "lw"};
 std::unordered_set<std::string> write_mem ={ "sb","sh","sw"};
@@ -24,12 +25,12 @@ int ROB::code[500]{};
 int ROB::MOD=500;
 inline bool ok=0;
 // inst构造函数实现
-inst::inst(){}
+inst::inst()= default;
 inst::inst(const instructions& a)
     :i(-1),op(a.op), pc(a.pc),rd(a.rd), rs1(a.rs1), rs2(a.rs2), imm(a.imm), st(Decoded) {}
 inline int p=0;
 inline int q=0;
-inline bool get_exit=0;
+inline bool get_exit=false;
 // 静态成员函数实现
 bool ROB::execute_5() {
     // std::cerr<<std::dec<<head<<"===========================================\n"<<std::dec<<tail<<"===================================================\n";
@@ -81,7 +82,7 @@ bool ROB::execute_5() {
                 if (add.contains(ROB_Table[i].op)) {
                     if (ROB_Table[i].ins==0x0ff00513) {
                         std::cout<<std::dec<<(Register::regs[10]&0xFF);
-                        // std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
+                        std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                         exit(0);
                     }
                     Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
@@ -123,7 +124,7 @@ bool ROB::execute_5() {
                             }else {
                                 std::cout<<std::dec<<(Register::regs[10]&0xFF);
                             }
-                            // std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
+                            std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                             exit(0);
                         }
                         Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
@@ -202,8 +203,11 @@ bool ROB::execute_5() {
                     if (jump.contains(ins.op)) {//如果decode出来发现op是jump指令，那么就暂时冻结pc
                         if (ins.op=="jal"||ins.op=="jalr") {
                             Ins_Cache::clear(Register::pc);//如果需要跳转，我立即就清除了所以指令缓存
+                            Reg_status::Busy_pc=true;//完成bubble的关键(对于jal和jalr，直接bubble)
+                        }else {
+                            predictor::get_busy(i);//jal和jalr直接bubble并且后续可以顺利执行，完全不用担心啦
                         }
-                        Reg_status::Busy_pc=true;//完成bubble的关键
+
                     }
                     if (load.contains(ROB_Table[i].op)) {//特殊的需要加入LSB中
                         ROB_Table[i].i=LSB_seq::add(ROB_Table[i]);
@@ -257,7 +261,7 @@ bool ROB::execute_1() {
                 if (add.contains(ROB_Table[i].op)) {
                     if (ROB_Table[i].ins==0x0ff00513) {
                         std::cout<<std::dec<<(Register::regs[10]&0xFF);
-                        // // std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
+                        std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                         exit(0);
                     }
                     Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);
@@ -287,7 +291,7 @@ bool ROB::execute_1() {
                             }else {
                                 std::cout<<std::dec<<(Register::regs[10]&0xFF);
                             }
-
+                            std::cerr<<std::dec<<"clk:"<<clock::ticker<<std::endl;
                             exit(0);
                         }
                         Write_regs::execute(i,ROB_Table[i].rd,ROB_Table[i].value);//不写回去，而是保持原来的值
